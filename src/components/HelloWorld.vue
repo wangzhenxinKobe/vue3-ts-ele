@@ -1,3 +1,7 @@
+/**
+ * @author kobe
+ * @date 2020/12/18 下午3:57
+*/
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>

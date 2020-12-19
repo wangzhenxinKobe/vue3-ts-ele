@@ -1,6 +1,9 @@
+/**
+ * @author kobe
+ * @date 2020/12/18 下午3:57
+*/
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
   </div>
 </template>
