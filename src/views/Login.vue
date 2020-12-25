@@ -1,6 +1,21 @@
 /** * @author kobe *@date 2020/12/18 下午3:56 */
 <template>
   <div class="login-wrap">
+    <div>
+      <el-button type="primary" @click="test()">测试</el-button>
+      <p>{{ nowTime }}</p>
+      <button @click="getNowTime">显示时间</button>
+    </div>
+    <div>
+      <suspense>
+        <template #default>
+          <girl-show />
+        </template>
+        <template #fallback>
+          <h1>loading...</h1>
+        </template>
+      </suspense>
+    </div>
     <div class="login_wrap">
       <el-card
         class="box-card"
@@ -67,12 +82,18 @@
   </div>
 </template>
 
-<script>
-import { ref, reactive, nextTick } from "vue";
+<script lang="ts">
+import { defineComponent, ref, reactive, nextTick, onMounted } from "vue";
 import { LoginVerifyCode, LoginSuccess } from "@/commom/js/api";
+import { ElLoading } from "element-plus";
+import { nowTime, getNowTime } from "@/hooks/useNowTime";
+import GirlShow from "@/components/GirlShow.vue";
 
-export default {
+export default defineComponent({
   name: "Login",
+  components: {
+    GirlShow
+  },
   data() {
     return {
       ruleCustom: {
@@ -90,7 +111,7 @@ export default {
   },
   setup() {
     let refs = "";
-    const userForm = el => {
+    const userForm = (el: string) => {
       refs = el;
     };
     const loginBtnText = ref("登录");
@@ -104,13 +125,12 @@ export default {
      * @author kobe
      * @date 2020/12/18 下午4:05
      */
-    function getVerifyCode() {
-      LoginVerifyCode().then(res => {
-        codeImgSrc.value = res.content;
-        verifyCodeKey.value = res.verifyCodeKey;
-      });
-    }
-    getVerifyCode();
+    const getVerifyCode = async () => {
+      const params: any = {};
+      const { content, verifyCodeKey: V } = await LoginVerifyCode(params);
+      codeImgSrc.value = content;
+      verifyCodeKey.value = V;
+    };
     /**
      * @description: 登录接口
      * @author kobe
@@ -118,7 +138,7 @@ export default {
      */
     function btnLogin() {
       nextTick(() => {
-        refs.validate(valid => {
+        (refs as any).validate((valid: boolean) => {
           const time = new Date().getTime();
           const sha512 = require("js-sha512").sha512;
           const pw = sha512(
@@ -132,15 +152,25 @@ export default {
             verifyCodeKey: verifyCodeKey.value
           };
           if (valid) {
-            LoginSuccess(params).then(res => {
+            LoginSuccess(params).then((res: any) => {
               console.log(res);
-              localStorage.setItem('WINABC-TOKEN', res.authentication);
+              localStorage.setItem("WINABC-TOKEN", res.authentication);
               // const data = res.data
-            })
+            });
           }
         });
       });
     }
+    const test = () => {
+      console.log("lll");
+      ElLoading.service({ fullscreen: true });
+      setTimeout(() => {
+        ElLoading.service().close();
+      }, 2000);
+    };
+    onMounted(() => {
+      getVerifyCode();
+    });
     return {
       loginBtnText,
       loginLoading,
@@ -148,10 +178,13 @@ export default {
       loginInfo,
       getVerifyCode,
       btnLogin,
-      userForm
+      userForm,
+      test,
+      nowTime,
+      getNowTime
     };
   }
-};
+});
 </script>
 
 <style>

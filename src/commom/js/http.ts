@@ -1,12 +1,11 @@
 /**
  * @author kobe
- * @date 2020/12/18 下午3:56
-*/
-/* eslint-disable */
+ * @date 2020/12/19 下午2:48
+ */
 
 import axios from "axios";
 import baseUrl from "./baseUrl";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
 // 配置请求域名
 axios.defaults.baseURL = baseUrl;
 
@@ -17,32 +16,31 @@ axios.defaults.timeout = 10000;
 axios.defaults.headers.post["Content-Type"] = "application/json; charset=UTF-8";
 
 //http请求拦截器
-axios.interceptors.request.use((config: any) => {
-  // const token: string = localStorage.getItem("WINABC-TOKEN") || "";
-  // if (token) {
-  //   config.headers.Authorization = token;
-  // }
-  return config
-
-}, (error: any) => {
-  (ElMessage as any).error("加载超时");
-  return Promise.reject(error);
-})
+axios.interceptors.request.use(
+  (config: any) => {
+    return config;
+  },
+  (error: any) => {
+    (ElMessage as any).error("加载超时");
+    return Promise.reject(error);
+  }
+);
 
 // http响应拦截器
-axios.interceptors.response.use((data: any) => {
-  if (data.data.code !== 200) {
-    if (data.data.msg !== "") {
-      (ElMessage as any).error(data.data.msg);
-    };
-    return Promise.reject("返回响应错误信息")
-  };
-  return data
-}, (error: any) => {
-  console.log(error);
-  (ElMessage as any).error("网络不给力呀！请稍候再试");
-  return Promise.reject(error)
-}
+axios.interceptors.response.use(
+  (data: any) => {
+    if (data.data.code && data.data.code !== 200) {
+      if (data.data.msg !== "") {
+        (ElMessage as any).error(data.data.msg);
+      }
+      return Promise.reject("返回响应错误信息");
+    }
+    return data;
+  },
+  (error: any) => {
+    (ElMessage as any).error("网络不给力呀！请稍候再试");
+    return Promise.reject(error);
+  }
 );
 
 export default class CourseAxios {
